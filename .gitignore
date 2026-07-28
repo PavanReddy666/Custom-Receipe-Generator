@@ -1,0 +1,20 @@
+# API Keys & Environment Variables (NEVER tracked or uploaded to GitHub)
+.env
+*.env
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE & OS Configuration
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

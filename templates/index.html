@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Recipe Generator | Gourmet Fork AI</title>
+    <meta name="description" content="Custom Recipe Generator powered by Gourmet Fork AI. Generate personalized gourmet recipes from your ingredients.">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="navbar">
+            <div class="logo">
+                <div class="logo-icon"><img src="{{ url_for('static', filename='favicon.svg') }}" alt="Gourmet Fork Logo" style="width: 32px; height: 32px;"></div>
+                <div class="logo-text">
+                    <h1>Custom <span class="accent-text">Recipe Generator</span></h1>
+                    <span class="tagline"><i class="fa-solid fa-utensils"></i> Gourmet Fork AI</span>
+                </div>
+            </div>
+
+            <!-- API Key Status Badge -->
+            <div id="apiKeyStatus" class="api-status-badge checking" onclick="openKeyModal()">
+                <i class="fa-solid fa-circle-notch fa-spin status-icon"></i>
+                <span class="status-text">Checking Key Status...</span>
+            </div>
+        </header>
+
+        <!-- API Key Info Modal / Banner -->
+        <div id="keyNoticeModal" class="modal-overlay hidden">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <i class="fa-solid fa-key accent-icon"></i>
+                        <h3>Gemini API Key Configuration</h3>
+                    </div>
+                    <button class="close-btn" onclick="closeKeyModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>To power the AI recipe generation, enter your Google Gemini API key in the configuration file:</p>
+                    <div class="key-filepath-box">
+                        <i class="fa-solid fa-file-code"></i>
+                        <span class="file-name">.env</span>
+                        <button class="copy-btn" onclick="copyFileName()" title="Copy filename"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                    <div class="instructions-steps">
+                        <div class="step-item">
+                            <span class="step-num">1</span>
+                            <span>Open the file named <code class="code-pill">.env</code> in the project directory.</span>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-num">2</span>
+                            <span>Set <code class="code-pill">GEMINI_API_KEY=your_key_here</code>.</span>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-num">3</span>
+                            <span>Get a free key from <a href="https://aistudio.google.com/" target="_blank" class="link">Google AI Studio <i class="fa-solid fa-arrow-up-right-from-square"></i></a>.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="closeKeyModal()">Got It!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invalid Ingredients Warning Modal -->
+        <div id="errorModal" class="modal-overlay hidden">
+            <div class="modal-card warning-card">
+                <div class="modal-header">
+                    <div class="modal-title error-title">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <h3>Invalid Ingredients Detected</h3>
+                    </div>
+                    <button class="close-btn" onclick="closeErrorModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorMessageText">The items provided could not be recognized as valid cooking ingredients or food items.</p>
+                    <div class="suggestion-box">
+                        <i class="fa-regular fa-lightbulb"></i>
+                        <span><strong>Tip:</strong> Please enter edible items like <em>2 eggs, 1 cup flour, 100g chicken, salt, garlic</em> along with their quantities!</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-warning" onclick="focusIngredientInput()">Re-enter Ingredients</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="main-layout">
+            <!-- Left Side: Input Panel -->
+            <section class="input-panel glass-card">
+                <div class="panel-header">
+                    <h2><i class="fa-solid fa-kitchen-set"></i> Kitchen Ingredients</h2>
+                    <p>Enter the items you have with quantities to generate a gourmet meal.</p>
+                </div>
+
+                <!-- Quick Select Tags -->
+                <div class="quick-select-section">
+                    <label class="section-label"><i class="fa-solid fa-bolt"></i> Quick-Add Staples</label>
+                    <div class="quick-tags-grid">
+                        <button type="button" class="quick-tag" onclick="quickAdd('Eggs', '2 pcs')">+ 🥚 Eggs</button>
+                        <button type="button" class="quick-tag" onclick="quickAdd('Garlic', '3 cloves')">+ 🧄 Garlic</button>
+                        <button type="button" class="quick-tag" onclick="quickAdd('Onion', '1 medium')">+ 🧅 Onion</button>
+                        <button type="button" class="quick-tag" onclick="quickAdd('Rice', '1 cup')">+ 🍚 Rice</button>
+                        <button type="button" class="quick-tag" onclick="quickAdd('Tomato', '2 pcs')">+ 🍅 Tomato</button>
+                        <button type="button" class="quick-tag" onclick="quickAdd('Chicken', '250 grams')">+ 🍗 Chicken</button>
+                        <button type="button" class="quick-tag" onclick="quickAdd('Potato', '2 pcs')">+ 🥔 Potato</button>
+                        <button type="button" class="quick-tag" onclick="quickAdd('Butter', '50 grams')">+ 🧈 Butter</button>
+                        <button type="button" class="quick-tag" onclick="quickAdd('Cheese', '100 grams')">+ 🧀 Cheese</button>
+                        <button type="button" class="quick-tag" onclick="quickAdd('Pasta', '200 grams')">+ 🍝 Pasta</button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Ingredients Form -->
+                <form id="recipeForm" onsubmit="handleFormSubmit(event)">
+                    <div class="ingredients-list-container">
+                        <div class="form-row-header">
+                            <span>Ingredient Name</span>
+                            <span>Quantity & Unit</span>
+                            <span>Action</span>
+                        </div>
+
+                        <div id="ingredientsRows" class="ingredients-rows">
+                            <!-- Rows inserted dynamically -->
+                        </div>
+
+                        <button type="button" class="btn btn-secondary add-row-btn" onclick="addIngredientRow()">
+                            <i class="fa-solid fa-plus"></i> Add Another Ingredient
+                        </button>
+                    </div>
+
+                    <!-- Preferences Accordion -->
+                    <div class="preferences-section">
+                        <div class="pref-header" onclick="togglePreferences()">
+                            <span><i class="fa-solid fa-sliders"></i> Culinary Preferences (Optional)</span>
+                            <i id="prefChevron" class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        
+                        <div id="prefBody" class="pref-body collapsed">
+                            <!-- Dietary Filters -->
+                            <div class="pref-group">
+                                <label class="pref-label">Dietary Requirements</label>
+                                <div class="checkbox-grid">
+                                    <label class="chip-checkbox">
+                                        <input type="checkbox" value="Vegetarian" name="dietary">
+                                        <span>🥬 Vegetarian</span>
+                                    </label>
+                                    <label class="chip-checkbox">
+                                        <input type="checkbox" value="Vegan" name="dietary">
+                                        <span>🌱 Vegan</span>
+                                    </label>
+                                    <label class="chip-checkbox">
+                                        <input type="checkbox" value="Gluten-Free" name="dietary">
+                                        <span>🌾 Gluten-Free</span>
+                                    </label>
+                                    <label class="chip-checkbox">
+                                        <input type="checkbox" value="Dairy-Free" name="dietary">
+                                        <span>🥛 Dairy-Free</span>
+                                    </label>
+                                    <label class="chip-checkbox">
+                                        <input type="checkbox" value="Keto / Low-Carb" name="dietary">
+                                        <span>🥑 Keto / Low-Carb</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Meal Type & Cuisine Grid -->
+                            <div class="pref-row-grid">
+                                <div class="pref-group">
+                                    <label for="mealTypeSelect" class="pref-label">Meal Type</label>
+                                    <select id="mealTypeSelect" class="custom-select">
+                                        <option value="Any">Any Meal</option>
+                                        <option value="Breakfast">Breakfast</option>
+                                        <option value="Lunch">Lunch</option>
+                                        <option value="Dinner">Dinner</option>
+                                        <option value="Snack">Quick Snack</option>
+                                        <option value="Dessert">Dessert</option>
+                                    </select>
+                                </div>
+
+                                <div class="pref-group">
+                                    <label for="cuisineSelect" class="pref-label">Cuisine Style</label>
+                                    <select id="cuisineSelect" class="custom-select">
+                                        <option value="Any">Any Cuisine</option>
+                                        <option value="Italian">Italian 🇮🇹</option>
+                                        <option value="Indian">Indian 🇮🇳</option>
+                                        <option value="Mexican">Mexican 🇲🇽</option>
+                                        <option value="Asian">Asian 🥢</option>
+                                        <option value="Mediterranean">Mediterranean 🌿</option>
+                                        <option value="American">American 🍔</option>
+                                    </select>
+                                </div>
+
+                                <div class="pref-group">
+                                    <label for="prepTimeSelect" class="pref-label">Max Prep Time</label>
+                                    <select id="prepTimeSelect" class="custom-select">
+                                        <option value="Any">Under 45 mins</option>
+                                        <option value="15 mins">Under 15 mins (Express)</option>
+                                        <option value="30 mins">Under 30 mins</option>
+                                        <option value="60 mins">Under 60 mins</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Action Button -->
+                    <button type="submit" id="generateBtn" class="btn btn-submit">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Generate Recipe with AI</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Right Side: Recipe Presentation & Output Area -->
+            <section class="output-panel">
+                <!-- Welcome Placeholder -->
+                <div id="welcomePlaceholder" class="glass-card placeholder-card">
+                    <div class="placeholder-icon">
+                        <i class="fa-solid fa-hat-chef"></i>
+                    </div>
+                    <h3>Ready to Cook Something Amazing?</h3>
+                    <p>Add your available ingredients on the left and let our AI Master Chef compose a personalized recipe for you!</p>
+                    
+                    <div class="feature-bullets">
+                        <div class="bullet-item"><i class="fa-solid fa-check"></i> Ingredient validation</div>
+                        <div class="bullet-item"><i class="fa-solid fa-check"></i> Interactive cooking steps</div>
+                        <div class="bullet-item"><i class="fa-solid fa-check"></i> Built-in timer</div>
+                        <div class="bullet-item"><i class="fa-solid fa-check"></i> Macro nutrition breakdown</div>
+                    </div>
+                </div>
+
+                <!-- Loading State Screen -->
+                <div id="loadingState" class="glass-card loading-card hidden">
+                    <div class="chef-loader">
+                        <div class="pan-container">
+                            <div class="food-item">🍳</div>
+                            <div class="pan"></div>
+                        </div>
+                    </div>
+                    <h3 class="loading-title">AI Chef is Crafting Your Recipe...</h3>
+                    <p id="loadingTip" class="loading-subtitle">Analyzing flavor profiles & cooking techniques...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Generated Recipe View Card -->
+                <div id="recipeDisplay" class="glass-card recipe-card hidden">
+                    <!-- Hero Banner Header -->
+                    <div class="recipe-hero">
+                        <div class="hero-top-bar">
+                            <span id="recipeCuisinePill" class="pill pill-gold">Italian</span>
+                            <span id="recipeDifficultyPill" class="pill pill-green">Easy</span>
+                            <div class="recipe-actions">
+                                <button class="icon-action-btn" onclick="saveRecipe()" title="Save Recipe"><i class="fa-regular fa-bookmark"></i></button>
+                                <button class="icon-action-btn" onclick="window.print()" title="Print Recipe"><i class="fa-solid fa-print"></i></button>
+                            </div>
+                        </div>
+
+                        <h2 id="recipeTitle" class="dish-title">Creamy Garlic Parmesan Pasta</h2>
+                        <p id="recipeTagline" class="dish-tagline">A rich, comforting 20-minute Italian classic cooked to perfection.</p>
+
+                        <!-- Key Stats Bar -->
+                        <div class="stats-bar">
+                            <div class="stat-box">
+                                <i class="fa-regular fa-clock"></i>
+                                <div class="stat-info">
+                                    <span class="stat-label">Total Time</span>
+                                    <span id="recipeTotalTime" class="stat-val">25 mins</span>
+                                </div>
+                            </div>
+
+                            <div class="stat-box">
+                                <i class="fa-solid fa-fire"></i>
+                                <div class="stat-info">
+                                    <span class="stat-label">Calories</span>
+                                    <span id="recipeCalories" class="stat-val">420 kcal</span>
+                                </div>
+                            </div>
+
+                            <div class="stat-box">
+                                <i class="fa-solid fa-users"></i>
+                                <div class="stat-info">
+                                    <span class="stat-label">Yield</span>
+                                    <span id="recipeServings" class="stat-val">2-3 Servings</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Macro Nutrition Pills -->
+                        <div id="macroContainer" class="macro-row">
+                            <span class="macro-badge">Protein: <strong id="macroProtein">18g</strong></span>
+                            <span class="macro-badge">Carbs: <strong id="macroCarbs">45g</strong></span>
+                            <span class="macro-badge">Fat: <strong id="macroFat">12g</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Top 3-Column Row: Ingredients, Assumed Pantry Items, Equipment Needed -->
+                    <div class="recipe-top-row-grid">
+                        <!-- Card 1: Ingredients Used -->
+                        <div class="sub-card top-row-card">
+                            <h3><i class="fa-solid fa-basket-shopping"></i> Ingredients Used</h3>
+                            <ul id="ingredientsList" class="styled-list">
+                                <!-- Dynamic list items -->
+                            </ul>
+                        </div>
+
+                        <!-- Card 2: Assumed Pantry Items (with alternates /) -->
+                        <div id="staplesCard" class="sub-card top-row-card">
+                            <h3><i class="fa-solid fa-salt-shaker"></i> Assumed Pantry Items</h3>
+                            <ul id="staplesList" class="styled-list subtle">
+                                <!-- Staples -->
+                            </ul>
+                        </div>
+
+                        <!-- Card 3: Equipment Needed (with alternates /) -->
+                        <div id="equipmentCard" class="sub-card top-row-card">
+                            <h3><i class="fa-solid fa-kitchen-set"></i> Equipment Needed</h3>
+                            <div id="equipmentTags" class="tag-cloud">
+                                <!-- Equipment tags -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Full-Width Section: Step-by-Step Instructions & Chef Insights -->
+                    <div class="recipe-bottom-instructions-section">
+                        <div class="sub-card full-width-card">
+                            <div class="instructions-header">
+                                <h3><i class="fa-solid fa-list-check"></i> Step-by-Step Instructions</h3>
+                                <span class="instruction-hint">Click steps to check off as you cook!</span>
+                            </div>
+
+                            <div id="instructionsList" class="instructions-timeline">
+                                <!-- Dynamic instructions -->
+                            </div>
+                        </div>
+
+                        <!-- Chef Tips & Pairings -->
+                        <div class="chef-insights-grid">
+                            <div id="chefTipsCard" class="sub-card tip-card">
+                                <h4><i class="fa-solid fa-lightbulb"></i> Chef's Secret Tip</h4>
+                                <p id="chefTipsText">Save 1/2 cup of starchy pasta water before draining to emulsify the sauce into silkiness.</p>
+                            </div>
+
+                            <div id="pairingsCard" class="sub-card pairing-card">
+                                <h4><i class="fa-solid fa-wine-glass"></i> Suggested Pairings</h4>
+                                <p id="pairingsText">Crisp Pinot Grigio or fresh Caesar salad.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Custom Recipe Generator &copy; 2026. Powered by Gourmet Fork & Google Gemini AI.</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
