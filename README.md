@@ -1,11 +1,18 @@
 # Custom Recipe Generator | Gourmet Fork AI 🍴✨
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-custom--receipe--generator.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://custom-receipe-generator.vercel.app/)
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Framework](https://img.shields.io/badge/framework-Flask-green.svg)](https://flask.palletsprojects.com/)
 [![AI Engine](https://img.shields.io/badge/AI-Google%20Gemini-orange.svg)](https://aistudio.google.com/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](#)
 
 An AI-powered gourmet custom recipe generator built using **Python Flask**, **JavaScript**, **CSS Glassmorphism**, and **Google Gemini AI**. Enter available pantry ingredients with quantities, select dietary preferences, and instantly receive custom recipes complete with interactive cooking step timers, nutrition macros, and alternative equipment & pantry substitutions formatted with slashes `/`.
+
+---
+
+## 🌐 Live Web Application
+
+👉 **[Click Here to Open the Live Project: https://custom-receipe-generator.vercel.app/](https://custom-receipe-generator.vercel.app/)**
 
 ---
 
@@ -60,7 +67,7 @@ echo "GEMINI_API_KEY=your_gemini_api_key_here" > .env
 # 4. Run the Flask application
 python app.py
 ```
-Open your browser and navigate to **`http://127.0.0.1:5000`**.
+Open your browser and navigate to **`http://127.0.0.1:5000`** or access the live deployment at **`https://custom-receipe-generator.vercel.app/`**.
 
 ---
 
