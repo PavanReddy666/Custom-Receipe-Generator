@@ -1,4 +1,7 @@
-from app import app
+import sys
+import os
 
-# Export Flask app for Vercel Serverless Function
-app = app
+# Add root directory to sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from app import app
