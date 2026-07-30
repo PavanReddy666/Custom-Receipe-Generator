@@ -124,7 +124,8 @@ h1, h2, h3, .dish-title {
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 600;
-    cursor: pointer;
+    cursor: default;
+    user-select: none;
     transition: var(--transition-fast);
     border: 1px solid transparent;
 }
