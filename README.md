@@ -111,4 +111,5 @@ Custom-Receipe-Generator/
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-          Built By [PavanReddy666](https://github.com/PavanReddy666)
+
+Built By [PavanReddy666](https://github.com/PavanReddy666)
