@@ -16,6 +16,18 @@ An AI-powered gourmet custom recipe generator built using **Python Flask**, **Ja
 
 ---
 
+## 🛠️ Technologies Used
+
+| Category | Technology | Description |
+|---|---|---|
+| **AI Engine** | ![Google Gemini](https://img.shields.io/badge/Google%20Gemini%203.6-4285F4?style=flat-square&logo=google&logoColor=white) | Generates customized gourmet recipes, validates food items, and provides alternative equipment substitutions (`/`). |
+| **Backend** | ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white) ![Flask](https://img.shields.io/badge/Flask-000000?style=flat-square&logo=flask&logoColor=white) | REST API endpoints (`/api/generate-recipe`, `/api/status`), prompt engineering, and environment routing. |
+| **Frontend** | ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) | Luxury Glassmorphism dark theme, dynamic ingredient builder, interactive checklist, and step timer widgets. |
+| **Typography & Icons** | ![Font Awesome](https://img.shields.io/badge/Font%20Awesome-528DD7?style=flat-square&logo=font-awesome&logoColor=white) ![Google Fonts](https://img.shields.io/badge/Google%20Fonts-4285F4?style=flat-square&logo=google&logoColor=white) | *Plus Jakarta Sans* & *Playfair Display* typography paired with culinary iconography. |
+| **Deployment** | ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white) ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white) | Vercel Python Serverless Functions with automatic GitHub deployment pipeline. |
+
+---
+
 ## 🌟 Key Features
 
 - 🍳 **Dynamic Ingredient Builder**: Input ingredients with custom quantities and units, or use quick-add pantry staple tags.
@@ -110,6 +122,3 @@ Custom-Receipe-Generator/
 ## 📜 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-
-Built By [PavanReddy666](https://github.com/PavanReddy666)
